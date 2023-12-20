@@ -1,4 +1,4 @@
-# whatsapp-bot-sticker
+![image](https://github.com/SendiSiradj/wa-bot/assets/60393303/a7ab36ff-cacc-4b91-9011-36e1ae98f883)# whatsapp-bot-sticker
 Simple whatsapp bot sticker.
 
 ### Supported Platform
@@ -16,7 +16,7 @@ sudo apt install -y gconf-service libgbm-dev libasound2 libatk1.0-0 libc6 libcai
 ### Installation
 
 ```
-git clone https://github.com/Aromakelapa/whatsapp-bot-sticker.git
+git clone https://github.com/SendiSiradj/wa-bot.git
 cd whatsapp-bot-sticker
 npm install
 npm start
