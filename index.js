@@ -87,6 +87,24 @@ client.on('message', async (msg) => {
           msg.reply('Send image with caption !sticker');
         };
         break;
+      case '!rm preview':
+        if (msg.hasMedia) {
+          const media = await msg.downloadMedia();
+
+          // Remove background from the image
+          const removedBgMedia = await removeBackground(media.data);
+
+          // const { MessageMedia } = require('whatsapp-web.js');
+
+          const mediaMessage = new MessageMedia('image/png', removedBgMedia);
+          chat.sendMessage(mediaMessage, {caption: 'ini preview foto yang udah dihapus bg nya, King'});         
+
+          // Send the image with the background removed
+          console.log(chalk.green(`💬 ${contact.pushname} : Preview with removed background sent!\n`));
+        } else {
+          msg.reply('Send image with caption !rm');
+        }
+        break;
       case '!rm':
         if (msg.hasMedia) {
           const media = await msg.downloadMedia();
@@ -97,11 +115,7 @@ client.on('message', async (msg) => {
           // const { MessageMedia } = require('whatsapp-web.js');
 
           const mediaMessage = new MessageMedia('document/png', removedBgMedia, 'remove.png');
-          chat.sendMessage(mediaMessage);
-
-          // const mediaMessage = MessageMedia.fromFilePath('C:\Users\AmuniX\OneDrive\Pictures\minerva\minrinwp.png');
-          // chat.sendMessage(mediaMessage);
-           
+          chat.sendMessage(mediaMessage, {caption: 'ini foto yang udah dihapus bg nya, King'});         
 
           // Send the image with the background removed
           console.log(chalk.green(`💬 ${contact.pushname} : Image with removed background sent!\n`));
