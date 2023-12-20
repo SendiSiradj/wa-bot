@@ -1,4 +1,3 @@
-![image](https://github.com/SendiSiradj/wa-bot/assets/60393303/a7ab36ff-cacc-4b91-9011-36e1ae98f883)# whatsapp-bot-sticker
 Simple whatsapp bot sticker.
 
 ### Supported Platform
