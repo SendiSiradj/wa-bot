@@ -9,7 +9,7 @@ import { createWriteStream, createReadStream } from 'fs';
 
 const spinnies = new Spinnies();
 const ffmpegPath = FfmpegPath.path;
-const { Client, LocalAuth } = WAWebJS;
+const { Client, LocalAuth, MessageMedia } = WAWebJS;
 
 
 
@@ -94,8 +94,16 @@ client.on('message', async (msg) => {
           // Remove background from the image
           const removedBgMedia = await removeBackground(media.data);
 
+          // const { MessageMedia } = require('whatsapp-web.js');
+
+          const mediaMessage = new MessageMedia('document/png', removedBgMedia, 'remove.png');
+          chat.sendMessage(mediaMessage);
+
+          // const mediaMessage = MessageMedia.fromFilePath('C:\Users\AmuniX\OneDrive\Pictures\minerva\minrinwp.png');
+          // chat.sendMessage(mediaMessage);
+           
+
           // Send the image with the background removed
-          chat.sendMessage(removedBgMedia, { caption: 'Background removed image', mimetype: 'image/png' });
           console.log(chalk.green(`💬 ${contact.pushname} : Image with removed background sent!\n`));
         } else {
           msg.reply('Send image with caption !rm');
@@ -115,18 +123,21 @@ async function removeBackground(mediaData) {
   const result = await removeBg.removeBackgroundFromImageBase64({
     base64img: mediaData,
     apiKey: '8xRHwVY6aEL7Brcw7NeVWJT7',
-    size: 'auto',
+    size: 'regular',
   });
 
-  if (result.statusCode === 200) {
-    // Convert base64 string to buffer
-    console.log("it's here");
-    const buffer = Buffer.from(result.base64img, 'base64');
-    return buffer;
-  } else {
-    console.error(`Error removing background: ${result.statusMessage}`);
-    return null; // Return null if there's an error
-  }
+  // console.log(result);
+
+  // if (result.statusCode === 200) {
+  //   // Convert base64 string to buffer
+  //   console.log("it's here");
+  //   const buffer = Buffer.from(result.base64img, 'base64');
+  //   return buffer;
+  // } else {
+  //   console.error(Error removing background: ${result.statusMessage});
+  //   return null; // Return null if there's an error
+  // }
+  return result.base64img;
 }
 
 // Disconnected
