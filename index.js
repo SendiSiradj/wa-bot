@@ -4,14 +4,18 @@ import qrcode from 'qrcode-terminal'
 import Spinnies from "spinnies";
 import chalk from 'chalk';
 import removeBg from 'remove.bg';
-import fs from 'fs/promises';
-import { createWriteStream, createReadStream } from 'fs';
+import puppeteer from 'puppeteer';
+import fs from 'fs';
+import { createWriteStream } from 'fs';
+import https from 'https';
+import axios from 'axios';
+
 
 const spinnies = new Spinnies();
 const ffmpegPath = FfmpegPath.path;
 const { Client, LocalAuth, MessageMedia } = WAWebJS;
 
-
+//make me a function to allow download video from twitter
 
 const client = new Client({
   authStrategy: new LocalAuth({
@@ -69,7 +73,7 @@ client.on('message', async (msg) => {
   console.log(chalk.cyan(`💬 ${contact.pushname} : ${msg.body}\n`));
 
   try {
-    switch (msg.body.toLowerCase()) {
+    switch (msg.body.trim().split(' ')[0].toLowerCase()) {
       case '!stiker':
       case '!sticker':
       case 'st':
@@ -97,7 +101,7 @@ client.on('message', async (msg) => {
           // const { MessageMedia } = require('whatsapp-web.js');
 
           const mediaMessage = new MessageMedia('image/png', removedBgMedia);
-          chat.sendMessage(mediaMessage, {caption: 'ini preview foto yang udah dihapus bg nya, King'});         
+          chat.sendMessage(mediaMessage, { caption: 'ini preview foto yang udah dihapus bg nya, King' });
 
           // Send the image with the background removed
           console.log(chalk.green(`💬 ${contact.pushname} : Preview with removed background sent!\n`));
@@ -115,13 +119,34 @@ client.on('message', async (msg) => {
           // const { MessageMedia } = require('whatsapp-web.js');
 
           const mediaMessage = new MessageMedia('document/png', removedBgMedia, 'remove.png');
-          chat.sendMessage(mediaMessage, {caption: 'ini foto yang udah dihapus bg nya, King'});         
+          chat.sendMessage(mediaMessage, { caption: 'ini foto yang udah dihapus bg nya, King' });
 
           // Send the image with the background removed
           console.log(chalk.green(`💬 ${contact.pushname} : Image with removed background sent!\n`));
         } else {
           msg.reply('Send image with caption !rm');
         }
+        break;
+
+      case '!video':
+        const tweetUrl = msg.body.split(' ')[1];
+        if (!tweetUrl) {
+          msg.reply('Please provide a tweet URL.');
+          break;
+        }
+        console.log(`Downloading video from ${tweetUrl}`);
+        const videoPath = await downloadVideo(tweetUrl);
+        console.log(`Video downloaded to ${videoPath}`)
+        const media = MessageMedia.fromFilePath(videoPath);
+        console.log(`Sending video message with mimetype: ${media.mimetype}, filename: ${media.filename}`);
+        if (!media) {
+          msg.reply('media is not exists');
+          break;
+        }
+        console.log("before msg.reply() function");
+        chat.sendMessage(media);
+        //msg.reply(media);
+        //msg.reply(new MessageMedia('video/mp4', fs.readFileSync(videoPath), 'video'));
         break;
 
       case '!error':
@@ -139,19 +164,40 @@ async function removeBackground(mediaData) {
     apiKey: '8xRHwVY6aEL7Brcw7NeVWJT7',
     size: 'regular',
   });
-
-  // console.log(result);
-
-  // if (result.statusCode === 200) {
-  //   // Convert base64 string to buffer
-  //   console.log("it's here");
-  //   const buffer = Buffer.from(result.base64img, 'base64');
-  //   return buffer;
-  // } else {
-  //   console.error(Error removing background: ${result.statusMessage});
-  //   return null; // Return null if there's an error
-  // }
   return result.base64img;
+}
+
+async function downloadVideo(tweetUrl) {
+  console.log(`Downloading video from twitter ${tweetUrl}`)
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  await page.goto(tweetUrl);
+  await page.waitForSelector('video');
+  const videoUrl = await page.evaluate(() => {
+    return document.querySelector('video').src;
+  });
+
+  console.log(`Video url: ${videoUrl}`);
+
+  const videoPath = 'output.mp4';
+  const writer = fs.createWriteStream(videoPath);
+
+  const response = await axios({
+    url: videoUrl,
+    method: 'GET',
+    responseType: 'stream',
+  });
+  
+  response.data.pipe(writer);
+  
+  return new Promise((resolve, reject) => {
+    writer.on('finish', () => {
+      console.log('Video downloaded successfully');
+      resolve(videoPath);
+    });
+    writer.on('error', reject);
+  });
+
 }
 
 // Disconnected
