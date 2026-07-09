@@ -21,21 +21,3 @@ npm install
 npm start
 ```
 
-
-## [DEPRECATED BCZ NO VPS] For more features, try my bot [here!](https://wa.me/6285942361411) Which features :
-- Sticker to Images.
-- Image to Sticker.
-- Facebook video downloader.
-- TikTok video downloader.
-- YouTube to MP3.
-- YouTube to MP4.
-- Image Background Remover.
-- Image Enhancer.
-- Encrypt text to Base64 strings.
-- Decrypt Base64 strings to text.
-- Forward Message.
-- URL Shortener.
-- ChatGPT OpenAI.
-- etc.
-
-## I sell custom bot scripts, just contact [me here!](https://wa.me/6283809574979)
